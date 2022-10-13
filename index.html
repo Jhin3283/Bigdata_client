@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- <title>원격 감시 AI 카메라 시스템</title> -->
+    <title>조선해운 빅데이터를 활용한 혁신서비스 컨설팅</title>
+
+    <link rel="stylesheet" href="./CSS/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Poppins"
+    />
+
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+    <script src="Scripts/jquery.signalR-2.4.1.min.js"></script>
+    <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
+
+    <link href="dist/css/tabulator.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="dist/js/tabulator.min.js"></script>
+    <style type="text/css">
+      html,
+      body {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        padding: 10px;
+      }
+
+      html {
+        padding: 0;
+      }
+
+      body {
+        padding: 0;
+      }
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke-width: 2px;
+      }
+
+      .domain,
+      .tick line {
+        stroke: #eee;
+      }
+
+      .axis text {
+        font-size: 12px;
+        fill: #555;
+      }
+
+      .line {
+        fill: none;
+        stroke: #ef0d0c;
+        stroke-width: 1.5px;
+      }
+
+      .content {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-width: 300px;
+        max-width: 960px;
+        max-height: 500px;
+        overflow: hidden;
+      }
+
+      button {
+        font-size: 1em;
+        margin-right: 5px;
+      }
+
+      .select_label {
+        display: flex;
+      }
+
+      .date_empty:before {
+        content: attr(data-placeholder);
+        width: calc(100%);
+      }
+    </style>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <!-- font-awesome, fonts -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css"
+      integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+    <link href="css/pages/sb-admin-2.css" rel="stylesheet" />
+
+    <!-- 한나라호 장비/설비 이미지맵 스타일 -->
+    <link href="css/pages/style-tooltip.css" rel="stylesheet" />
+  </head>
+
+  <body id="L_p04">
+    <div id="wrapper">
+      <!-- Sidebar -->
+      <div style="position: relative">
+        <div style="position: fixed; z-index: 20">
+          <ul
+            class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+            id="accordionSidebar"
+          >
+            <!-- Sidebar - Brand -->
+            <a
+              class="sidebar-brand d-flex align-items-center justify-content-center"
+              href="index.html"
+            >
+              <div class="sidebar-brand-icon">
+                <i class="fa-solid fa-ship"></i>
+              </div>
+              <div class="sidebar-brand-text mx-3">BigdataSea</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0" />
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+              <a
+                class="nav-link collapsed"
+                id="aisViewerBtn"
+                href="#"
+                data-target="#collapseTwo"
+                aria-expanded="true"
+                aria-controls="collapseTwo"
+              >
+                <i class="fas fa-fw fa-cog"></i>
+                <span>AIS 운항 데이터 조회</span>
+              </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0" />
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+              <a
+                class="nav-link collapsed"
+                href="#"
+                id="equipmentBtn"
+                data-target="#collapseUtilities"
+                aria-expanded="true"
+                aria-controls="collapseUtilities"
+              >
+                <i class="fas fa-fw fa-wrench"></i>
+                <span>장비/설비 현황</span>
+              </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0" />
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+              <a
+                class="nav-link collapsed"
+                href="#"
+                id="monitoringBtn"
+                data-target="#collapsePages"
+                aria-expanded="true"
+                aria-controls="collapsePages"
+              >
+                <i class="fas fa-fw fa-folder"></i>
+                <span>추진축계/기관엔진 데이터</span>
+              </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block" />
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+              <button
+                class="rounded-circle border-0"
+                id="sidebarToggle"
+                onclick="toggleButton()"
+              ></button>
+            </div>
+          </ul>
+        </div>
+        <!-- End of Sidebar -->
+        <div id="sidebar-sm" style="padding-left: 14rem">
+          <!-- Topbar -->
+          <div style="position: fixed; z-index: 10">
+            <nav
+              id="topbar"
+              class="navbar navbar-expand navbar-light bg-white topbar static-top shadow"
+            >
+              <!-- Sidebar Toggle (Topbar) -->
+              <form class="form-inline">
+                <button
+                  id="sidebarToggleTop"
+                  class="btn btn-link d-md-none rounded-circle mr-3"
+                >
+                  <i class="fa fa-bars"></i>
+                </button>
+              </form>
+
+              <!-- Topbar Search -->
+              <div
+                class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search"
+              >
+                <div>
+                  <div id="searchPackage" class="row">
+                    <select
+                      class="form-select bg-light border-1 small col m-1"
+                      style="max-width: 300px"
+                      id="selectShip"
+                      name="ship"
+                      onchange="setDate()"
+                    >
+                      <!-- <option>전체</option> -->
+                      <option value="noShip">--선박 선택--</option>
+                      <option value="HANNARA">한나라호</option>
+                      <option value="HANBADA">한바다호</option>
+                    </select>
+                    <!-- <select
+                      class="form-control bg-light border-1 small col m-1"
+                      id=""
+                    >
+                      <option>연안</option>
+                    </select>
+                    <select
+                      class="form-control bg-light border-1 small col m-1"
+                      id=""
+                    >
+                      <option>--관측소--</option>
+                      <option value="DT_0019">가덕도</option>
+                    </select> -->
+                    <div class="col-4 m-1" id="date_dropdown">
+                      <div class="row">
+                        <input
+                          class="form-control bg-light border-1 col mr-1 date_empty placeholder-date"
+                          id="startDate"
+                          type="date"
+                          style="height: 38px"
+                          data-placeholder="시작 날짜 선택"
+                          name="startDate"
+                        />
+                        ~
+                        <input
+                          type="date"
+                          class="form-control bg-light border-1 col ml-1 date_empty placeholder-date"
+                          id="endDate"
+                          style="height: 38px"
+                          data-placeholder="종료 날짜 선택"
+                          name="endDate"
+                        />
+                      </div>
+                    </div>
+                    <!--수정 = 시간 추가-->
+                    <div class="col-4 m-1" id="time_dropdown">
+                      <div class="row">
+                        <input
+                          class="form-control bg-light border-1 col mr-1 date_empty placeholder-date"
+                          id="startTime"
+                          type="time"
+                          style="height: 38px"
+                          data-placeholder="시작 시간 선택"
+                          name="startTime"
+                        />
+                        ~
+                        <input
+                          class="form-control bg-light border-1 col mr-1 date_empty placeholder-date"
+                          id="endTime"
+                          type="time"
+                          style="height: 38px"
+                          data-placeholder="종료 시간 선택"
+                          name="endTime"
+                        />
+                      </div>
+                    </div>
+                    <!--수정 = 장비 선택 추가-->
+                    <select
+                      class="form-select bg-light border-1 small col m-1"
+                      style="max-width: 300px"
+                      id="selectTool"
+                      name="tool"
+                    >
+                      <!-- <option>전체</option> -->
+                      <option value="noTool">--장비 선택--</option>
+                      <option value="Communication">통신</option>
+                      <option value="Equipment">기자재</option>
+                    </select>
+                    <!-- <button type="button" class="btn btn-primary col-1 m-1"><i
+                                            class="fas fa-download fa-sm text-white-50"></i> 조회</button> -->
+                    <button
+                      class="btn btn-primary"
+                      style="margin: 0.25rem; width: 38px"
+                      ;
+                      type="button"
+                      onclick="doSearchShip()"
+                    >
+                      <i class="fas fa-search fa-sm"></i>
+                    </button>
+                  </div>
+                  <!-- <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                    aria-label="Search" aria-describedby="basic-addon2"> -->
+                </div>
+              </div>
+
+              <!-- Topbar Navbar -->
+              <ul class="navbar-nav ml-auto">
+                <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                <li class="nav-item dropdown no-arrow d-sm-none">
+                  <a
+                    class="nav-link dropdown-toggle"
+                    href="#"
+                    id="searchDropdown"
+                    role="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <i class="fas fa-search fa-fw"></i>
+                  </a>
+                  <!-- Dropdown - Messages -->
+                  <div
+                    class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                    aria-labelledby="searchDropdown"
+                  >
+                    <form class="form-inline mr-auto w-100 navbar-search">
+                      <div class="input-group">
+                        <input
+                          type="text"
+                          class="form-control bg-light border-0 small"
+                          placeholder="Search for..."
+                          aria-label="Search"
+                          aria-describedby="basic-addon2"
+                        />
+                        <div class="input-group-append">
+                          <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search fa-sm"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </li>
+                <div class="topbar-divider d-none d-sm-block"></div>
+              </ul>
+            </nav>
+          </div>
+          <!-- End of Topbar -->
+        </div>
+
+        <script>
+          // 사이드바 토글 기능 보완
+          let toggleStatus = true;
+          function toggleButton() {
+            if (toggleStatus === true) {
+              document.querySelector("#sidebar-sm").style.paddingLeft =
+                "6.5rem";
+              toggleStatus = false;
+            } else {
+              document.querySelector("#sidebar-sm").style.paddingLeft = "14rem";
+              toggleStatus = true;
+            }
+          }
+          window.onresize = function (event) {
+            var innerWidth = window.innerWidth;
+            innerWidth < "768"
+              ? (document.querySelector("#sidebar-sm").style.paddingLeft =
+                  "6.5rem")
+              : (document.querySelector("#sidebar-sm").style.paddingLeft =
+                  "14rem");
+          };
+        </script>
+      </div>
+
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Contents 표시 영역 -->
+          <div style="padding-top: 4.375rem">
+            <div id="aisViewer" style="z-index: 5">
+              <!-- <div class="header mt-0">
+                <div class="burger left">
+                  <div class="line1"></div>
+                  <div class="line2"></div>
+                  <div class="line3"></div>
+                </div>
+
+                <div class="logo left">
+                  <h4>AIS Viewer</h4>
+                </div>
+
+                <div class="toolbar">
+                  <img src="image/eblvrm.png" id="ebl_vrm" />
+                  <img src="image/map_simple.png" id="simple_tiles" />
+                  <img src="image/map_standard.png" id="standard_tiles" />
+                  <img src="image/map_detail.png" id="detail_tiles" />
+                </div>
+
+                <div class="logo right">
+                  <h4>AIS Viewer</h4>
+                </div>
+
+                <div class="burger right">
+                  <div class="line1"></div>
+                  <div class="line2"></div>
+                  <div class="line3"></div>
+                </div>
+              </div> -->
+
+              <!-- Contents: AIS VIEWER -->
+              <div class="main">
+                <!-- <div class="pnl_schedule_table" id="pnl_schedule_table">
+                  <p class="pnl_title">
+                    입출항 선박 리스트
+                    <span class="arrow left"></span>
+                  </p>
+                  <div class="schedule_table" id="schedule-table"></div>
+                </div> -->
+
+                <div id="map" class="map">
+                  <!-- <div id="popup"></div> -->
+                </div>
+
+                <div class="pnl_ais_table" id="pnl_ais_table">
+                  <p class="pnl_title">
+                    <span class="arrow right"></span>
+                    &nbsp;
+                  </p>
+                  <div id="ais-table" class="ais_table"></div>
+                </div>
+              </div>
+
+              <footer class="footer">
+                <div class="ttl_ais_count" id="ttl-ais-count"></div>
+                <div class="latlon" id="mouse-position"></div>
+              </footer>
+
+              <script src="index.js">
+                var good = function(){
+                  send_data(AIS_data)
+                }
+              </script>
+            </div>
+          </div>
+
+          <!-- Contents: 장비/설비 현황 -->
+          <div id="equipment">
+            <!-- Contents: 장비/설비 현황 Title -->
+            <div class="container-fluid mt-4">
+              <!-- Page Heading -->
+              <h1 class="h3 mb-2 text-gray-800">장비/설비 현황</h1>
+              <p class="mb-4">장비/설비 현황입니다.</p>
+              <div>
+                <!-- Contents: 장비/설비 현황 - 한나라호 -->
+                <div id="hannara" style="display: block">
+                  <div class="row">
+                    <div class="col">
+                      <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                          <h6 class="m-0 font-weight-bold text-primary">
+                            한나라호
+                          </h6>
+                        </div>
+                        <div class="card-body">
+                          <div>
+                            <img
+                              width="760px"
+                              src="img/ship_hannara_800.png"
+                              alt="..."
+                            />
+                            <!-- 이미지 맵은 JavaScript로 DOM 생성하는 방식 적용 요망 -->
+                            <!-- 한나라호 장비/설비 이미지 맵 -->
+                            <!-- <div>
+                              <div id="image-map">
+                                <img
+                                  width="760px"
+                                  src="img/ship_hannara_800.png"
+                                  alt="..."
+                                />
+                                <div class="pin" data-xpos="50" data-ypos="270">
+                                  <h2>기관엔진 모터링 데이터</h2>
+                                  <ul>
+                                    <li><strong>VSL_NO: 440956000</strong></li>
+                                    <li>TRNNG_SHP_NAME: HANNARA</li>
+                                    <li>MSRM_DTM: 2021-10-19 03:18:49</li>
+                                    <li>
+                                      <a href="#" target="_blank"
+                                        >상세보기URL</a
+                                      >
+                                    </li>
+                                    <li><br /></li>
+                                    <li>
+                                      <img
+                                        class="mt-3"
+                                        width="200px"
+                                        src="img/engine.jpg"
+                                        alt="..."
+                                      />
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                              <div class="pin" data-xpos="470" data-ypos="170">
+                                <h2>기관엔진 모터링 데이터</h2>
+                                <ul>
+                                  <li><strong>VSL_NO: 440956000</strong></li>
+                                  <li>TRNNG_SHP_NAME: HANNARA</li>
+                                  <li>MSRM_DTM: 2021-10-19 03:18:49</li>
+                                  <li>
+                                    <a href="#" target="_blank">상세보기URL</a>
+                                  </li>
+                                  <li><br /></li>
+                                  <li>
+                                    <img
+                                      class="mt-3"
+                                      width="200px"
+                                      src="img/engine.jpg"
+                                      alt="..."
+                                    />
+                                  </li>
+                                </ul>
+                              </div>
+                              <div class="pin" data-xpos="680" data-ypos="250">
+                                <h2>설비C</h2>
+                                <ul>
+                                  <li><strong>Spec...</strong></li>
+                                  <li>Spec...</li>
+                                  <li>Etc...</li>
+                                  <li>
+                                    <a href="#" target="_blank">상세보기URL</a>
+                                  </li>
+                                  <li><br /></li>
+                                  <li>
+                                    <img
+                                      class="mt-3"
+                                      width="200px"
+                                      src="img/engine.jpg"
+                                      alt="..."
+                                    />
+                                  </li>
+                                </ul>
+                              </div>
+                              <script src="js/script-tooltip.js"></script>
+                            </div> -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                          <h6 class="m-0 font-weight-bold text-primary">
+                            DataTables
+                          </h6>
+                        </div>
+                        <div class="card-body">
+                          <div
+                            class="table-responsive"
+                            style="height: 460px; overflow: auto"
+                          >
+                            <table
+                              class="table table-bordered"
+                              id="dataTable"
+                              width="100%"
+                              cellspacing="0"
+                            >
+                              <thead>
+                                <tr>
+                                  <th>번호</th>
+                                  <th>장비/설비명</th>
+                                  <th>장비/설비 사진</th>
+                                </tr>
+                              </thead>
+                              <tbody id="tbBody"></tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Contents: 장비/설비 현황 - 한바다호 -->
+                <div id="hanbada" style="display: none">
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                          <h6 class="m-0 font-weight-bold text-primary">
+                            한바다호
+                          </h6>
+                        </div>
+                        <div class="card-body">
+                          <div>
+                            <div id="image-map">
+                              <img
+                                width="760px"
+                                src="img/ship_hanbada_800.png"
+                                alt="..."
+                              />
+                            </div>
+                            <!-- 한바다호 장비/설비 이미지 맵 -->
+                            <!-- <div style="text-align: center">
+                              <div id="image-map">
+                                <img
+                                  width="760px"
+                                  src="img/ship_hanbada_800.png"
+                                  alt="..."
+                                />
+                                <div class="pin" data-xpos="50" data-ypos="270">
+                                  <h2>기관엔진 모터링 데이터</h2>
+                                  <ul>
+                                    <li><strong>VSL_NO: 440956000</strong></li>
+                                    <li>TRNNG_SHP_NAME: HANNARA</li>
+                                    <li>MSRM_DTM: 2021-10-19 03:18:49</li>
+                                    <li>
+                                      <a href="#" target="_blank"
+                                        >상세보기URL</a
+                                      >
+                                    </li>
+                                    <li><br /></li>
+                                    <li>
+                                      <img
+                                        class="mt-3"
+                                        width="200px"
+                                        src="img/engine.jpg"
+                                        alt="..."
+                                      />
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                              <div class="pin" data-xpos="470" data-ypos="170">
+                                <h2>기관엔진 모터링 데이터</h2>
+                                <ul>
+                                  <li><strong>VSL_NO: 440956000</strong></li>
+                                  <li>TRNNG_SHP_NAME: HANNARA</li>
+                                  <li>MSRM_DTM: 2021-10-19 03:18:49</li>
+                                  <li>
+                                    <a href="#" target="_blank">상세보기URL</a>
+                                  </li>
+                                  <li><br /></li>
+                                  <li>
+                                    <img
+                                      class="mt-3"
+                                      width="200px"
+                                      src="img/engine.jpg"
+                                      alt="..."
+                                    />
+                                  </li>
+                                </ul>
+                              </div>
+                              <div class="pin" data-xpos="680" data-ypos="250">
+                                <h2>설비C</h2>
+                                <ul>
+                                  <li><strong>Spec...</strong></li>
+                                  <li>Spec...</li>
+                                  <li>Etc...</li>
+                                  <li>
+                                    <a href="#" target="_blank">상세보기URL</a>
+                                  </li>
+                                  <li><br /></li>
+                                  <li>
+                                    <img
+                                      class="mt-3"
+                                      width="200px"
+                                      src="img/engine.jpg"
+                                      alt="..."
+                                    />
+                                  </li>
+                                </ul>
+                              </div>
+                              <script src="js/script-tooltip.js"></script>
+                            </div> -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                          <h6 class="m-0 font-weight-bold text-primary">
+                            DataTables
+                          </h6>
+                        </div>
+                        <div class="card-body">
+                          <div
+                            class="table-responsive"
+                            style="height: 460px; overflow: auto"
+                          >
+                            <table
+                              class="table table-bordered"
+                              id="dataTable"
+                              width="100%"
+                              cellspacing="0"
+                            >
+                              <thead>
+                                <tr>
+                                  <th>번호</th>
+                                  <th>장비/설비명</th>
+                                  <th>장비/설비 사진</th>
+                                </tr>
+                              </thead>
+                              <tbody id="tbBody"></tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 장비/설비 모달 -->
+          <div
+            class="modal fade"
+            id="equipmentModal"
+            data-bs-keyboard="false"
+            tabindex="-1"
+            aria-labelledby="staticBackdropLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel">
+                    장비/설비 사진
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <div class="row mb-3">
+                    <label for="img_name" class="col-sm-4 col-form-label"
+                      >장비/설비명</label
+                    >
+                    <div class="col-sm-8">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="img_name"
+                        disabled
+                      />
+                      <input type="hidden" id="selectedId" value="" />
+                    </div>
+                  </div>
+                  <div id="modal-img"></div>
+                </div>
+                <div class="modal-footer">
+                  <!-- <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    닫기
+                  </button> -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"
+          ></script>
+
+          <!-- 장비/설비 모달 -->
+          <script>
+            function openModal(id) {
+              console.log(id);
+              selectedId = id;
+              document.querySelector("#selectedId").value = id;
+              let equipment = equipmentData.filter(
+                (c) => String(c.image) === String(id)
+              )[0]; // 타입이 안맞아 필터가 안되었음. 따라서 String으로 맞추었음
+              console.log(equipment.img_name)
+              document.querySelector("#img_name").value = equipment.Equipmentname;
+
+              const h = [];
+              h.push(`<img width=466px" src="${equipment.image}" alt="">`);
+
+              document.querySelector("#modal-img").innerHTML = h.join("");
+
+              var myModal = new bootstrap.Modal(
+                document.querySelector("#equipmentModal")
+              );
+              myModal.show();
+            }
+
+            function closeModal() {
+              selectedId = "";
+              var myModal = new bootstrap.Modal(
+                document.querySelector("#equipmentModal")
+              );
+              myModal.hide();
+            }
+          </script>
+
+          <!-- 로컬 장비/설비 json 읽기 -->
+          <script src="img.json" type="text/javascript"></script>
+          <script>
+            let equipmentImg = JSON.parse(JSON.stringify(equipment));
+            console.log(equipmentImg);
+          </script>
+
+          <!-- Content: 추진축계 모니터링 데이터 -->
+          <div id="monitoring">
+            <!-- Contents: 선박 사진 -->
+            <div class="container-fluid mt-4">
+              <!-- Page Heading -->
+              <h1 class="h3 mb-2 text-gray-800">기관엔진/추진축계 데이터</h1>
+              <p class="mb-4">기관엔진/추진축계 데이터 결과입니다.</p>
+
+              <div class="row">
+                <div class="col">
+                  <!-- 한나라호 이미지 -->
+                  <!--              <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-primary">
+                        한나라호
+                      </h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="text-center">
+                        <!- - <img style="width: 760px;" src="img/ship_hannara_800.png" alt="..."> - ->
+                        <img
+                          style="width: 760px"
+                          src="img/ship_hannara_800.png"
+                          alt="..."
+                        />
+                      </div>
+                    </div>
+                  </div>-->
+                  <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-primary">
+                        기관엔진 모니터링 데이터 결과
+                      </h6>
+                    </div>
+                    <div class="card-body">
+                      <svg class="svg1"></svg>
+                      <!-- <script type="text/javascript"> -->
+                      <!-- <script src="kalman.js"></script> -->
+                      <script type="text/javascript">
+                      // var kf = new KalmanFilter();
+                        // var jScript = document.createElement("script");
+                        // jScript.src = "dist/kalman-filter.min.js";
+                        // document.body.appendChild(jScript);
+                        // var KalmanFilter = jScript.KalmanFilter;
+                        // D3.js 스크립트 (기관엔진 모니터링 데이터)
+                        function D3A (engine_data) {
+                        var data = engine_data;
+                        // for (var i = 0; i < 15; i++) {
+                        //   data.push({
+                        //     year: 2000 + i,
+                        //     value: Math.random() * 425,
+                        //   });
+                        // };
+                        console.log(engine_data)
+                        var svg = d3.select(".svg1");
+                        var margin = 65,
+                          width = 760 - margin * 2,
+                          height = 500 - margin * 2;
+
+                        svg.attr({
+                          width: width + margin,
+                          height: height + margin * 2,
+                          transform: "translate(" + margin + "," + margin + ")",
+                        });
+
+                        var xScale = d3
+                          .scaleBand()
+                          .domain(data.map((d) => d.DATE))
+                          .range([0, width]);
+
+                        var yScale = d3
+                          .scaleLinear()
+                          .domain([0, d3.max(data.map((d) => d.OVERALL)) * 1.1])
+                          .range([0, height]);
+
+                        var yScale2 = d3
+                          .scaleLinear()
+                          .domain([0, d3.max(data.map((d) => d.OVERALL)) * 1.1])
+                          .range([height, 0]);
+
+                        var xAxis = d3
+                          .axisBottom()
+                          .scale(xScale)
+                          .tickSizeInner(-height)
+                          .tickSizeOuter(0)
+                          .tickPadding(10);
+
+                        var yAxis = d3
+                          .axisLeft()
+                          .scale(yScale2)
+                          .tickSizeInner(-(width + 20))
+                          .tickSizeOuter(0)
+                          .tickPadding(10);
+
+                        // svg
+                        //   .append("g")
+                        //   .attr("class", "x axis")
+                        //   .attr(
+                        //     "transform",
+                        //     `translate(${margin}, ${height + margin})`
+                        //   )
+                        //   .call(xAxis);
+
+                        svg
+                          .append("g")
+                          .attr("class", "y axis")
+                          .attr("transform", `translate(${margin}, ${margin})`)
+                          .call(yAxis);
+
+                        var linePath = d3
+                          .line()
+                          .x((d) => xScale(d.DATE) + margin)
+                          .y((d) => yScale2(d.OVERALL) + margin);
+
+                        svg
+                          .selectAll("path.xline")
+                          .data([data])
+                          .enter()
+                          .append("path")
+                          .classed("xline", true)
+                          .attr("fill", "none")
+                          .attr("stroke", "red")
+                          .attr("stroke-width", "2")
+                          .attr("d", (d) => linePath(d));
+
+                        svg
+                          .selectAll(".dot")
+                          .data(data)
+                          .enter()
+                          .append("g")
+                          .classed("dot", true)
+                          //.append('circle')
+                          .attr("cx", (d) => xScale(d.DATE) + margin)
+                          .attr("cy", (d) => yScale2(d.OVERALL) + margin)
+                          .attr("r", 5)
+                          .attr("fill", "#555");
+
+                        svg
+                          .select(".x.axis")
+                          .selectAll(".tick text")
+                          .attr("dx", 25);
+
+                        svg
+                          .select(".x.axis")
+                          .selectAll(".tick line")
+                          .attr("transform", "translate(25, 0)");
+
+                        svg.selectAll(".xline");
+                        //.attr("transform", "translate(20, 0)");
+
+                        svg
+                          .selectAll(".dot")
+                          .attr("transform", "translate(20, 0)");
+
+                        var linePath = d3
+                          .line()
+                          .x((d) => xScale(d.DATE) + margin)
+                          .y((d) => yScale2(d.OVERALL) + margin)
+                          .curve(d3["curveBasis"]);
+                          //.curve(d3["curveLinear"]);
+
+                        svg
+                          .selectAll("path.xline")
+                          .transition()
+                          .duration(1000)
+                          .ease(d3.easeLinear)
+                          .attr("d", (d) => linePath(d));
+
+                        var interpolates = [
+                          "curveLinear",
+                          "curveStep",
+                          "curveStepBefore",
+                          "curveStepAfter",
+                          "curveBasis",
+                          "curveCardinal",
+                          "curveMonotoneX",
+                          "curveCatmullRom",
+                        ];
+
+                        // d3.select("body")
+                        //   .selectAll(".btn")
+                        //   .data(interpolates)
+                        //   .data("curveBasis")
+                        //   .enter()
+                        //   .append("button")
+                        //   .classed("btn", true)
+                        //   .text(function (d) {
+                        //     return d;
+                        //   });
+
+                        d3.selectAll(".btn").on("click", function (e) {
+                          var interpolate = d3.select(this).text();
+
+                          var linePath = d3
+                            .line()
+                            .x((d) => xScale(d.DATE) + margin)
+                            .y((d) => yScale2(d.OVERALL) + margin)
+                            .curve(d3[interpolates[4]]);
+
+                          svg
+                            .selectAll("path.xline")
+                            .transition()
+                            .duration(1000)
+                            .ease(d3.easeLinear)
+                            .attr("d", (d) => linePath(d));
+                        });
+                      }
+                      </script>
+                      <!-- <img style="width: 760px; height: 456px;" src="img/graph.png" alt="..."> -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <!-- Contents: 추진축계 모니터링 그래프 -->
+                  <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-primary">
+                        추진축계 모니터링 데이터 결과
+                      </h6>
+                    </div>
+                    <div class="card-body">
+                      <svg class="svg"></svg>
+                      <script type="text/javascript">
+                        // D3.js 스크립트 (추진축계 모니터링 데이터)
+                       function D3B (equip_data){
+                        var data = equip_data;
+                        //   var data = [];
+                        // for (var i = 0; i < 15; i++) {
+                        //   data.push({
+                        //     year: 2000 + i,
+                        //     value: Math.random() * 425,
+                        //   });
+                        // }
+
+                        var svg = d3.select(".svg");
+                        var margin = 65,
+                          width = 760 - margin * 2,
+                          height = 500 - margin * 2;
+
+                        svg.attr({
+                          width: width + margin,
+                          height: height + margin * 2,
+                          transform: "translate(" + margin + "," + margin + ")",
+                        });
+
+                        var xScale = d3
+                          .scaleBand()
+                          .domain(data.map((d) => d.DataInfo))
+                          //.domain(data.map((d) => d.year))
+                          .range([0, width]);
+
+                        var yScale = d3
+                          .scaleLinear()
+                          .domain([0, d3.max(data.map((d) => d.Tachometer)) * 1.1])
+                          //.domain([0, d3.max(data.map((d) => d.value)) * 1.1])
+                          .range([0, height]);
+
+                        var yScale2 = d3
+                          .scaleLinear()
+                          .domain([0, d3.max(data.map((d) => d.Tachometer)) * 1.1])
+                          //.domain([0, d3.max(data.map((d) => d.value)) * 1.1])
+                          .range([height, 0]);
+
+                        var xAxis = d3
+                          .axisBottom()
+                          .scale(xScale)
+                          .tickSizeInner(-height)
+                          .tickSizeOuter(0)
+                          .tickPadding(10);
+
+                        var yAxis = d3
+                          .axisLeft()
+                          .scale(yScale2)
+                          .tickSizeInner(-(width + 20))
+                          .tickSizeOuter(0)
+                          .tickPadding(10);
+
+                        // svg
+                        //   .append("g")
+                        //   .attr("class", "x axis")
+                        //   .attr(
+                        //     "transform",
+                        //     `translate(${margin}, ${height + margin})`
+                        //   )
+                        //   .call(xAxis);
+
+                        svg
+                          .append("g")
+                          .attr("class", "y axis")
+                          .attr("transform", `translate(${margin}, ${margin})`)
+                          .call(yAxis);
+
+                        var linePath = d3
+                          .line()
+                          .x((d) => xScale(d.DataInfo) + margin)
+                          .y((d) => yScale2(d.Tachometer) + margin);
+                          //.x((d) => xScale(d.year) + margin)
+                          //.y((d) => yScale2(d.value) + margin);
+
+                        svg
+                          .selectAll("path.xline")
+                          .data([data])
+                          .enter()
+                          .append("path")
+                          .classed("xline", true)
+                          .attr("fill", "none")
+                          .attr("stroke", "red")
+                          .attr("stroke-width", "2")
+                          .attr("d", (d) => linePath(d));
+
+                        svg
+                          .selectAll(".dot")
+                          .data(data)
+                          .enter()
+                          .append("g")
+                          .classed("dot", true)
+                          //.append('circle')
+                          .attr("cx", (d) => xScale(d.DataInfo) + margin)
+                          .attr("cy", (d) => yScale2(d.Tachometer) + margin)
+                          //.attr("cx", (d) => xScale(d.year) + margin)
+                          //.attr("cy", (d) => yScale2(d.value) + margin)
+                          .attr("r", 5)
+                          .attr("fill", "#555");
+
+                        svg
+                          .select(".x.axis")
+                          .selectAll(".tick text")
+                          .attr("dx", 25);
+
+                        svg
+                          .select(".x.axis")
+                          .selectAll(".tick line")
+                          .attr("transform", "translate(25, 0)");
+
+                        svg.selectAll(".xline");
+                        //.attr("transform", "translate(20, 0)");
+
+                        svg
+                          .selectAll(".dot")
+                          .attr("transform", "translate(20, 0)");
+
+                        var linePath = d3
+                          .line()
+                          .x((d) => xScale(d.DataInfo) + margin)
+                          .y((d) => yScale2(d.Tachometer) + margin)
+                          //.x((d) => xScale(d.year) + margin)
+                          //.y((d) => yScale2(d.value) + margin)
+                          .curve(d3["curveBasis"]);
+                          //.curve(d3["curveLinear"]);
+
+                        svg
+                          .selectAll("path.xline")
+                          .transition()
+                          .duration(1000)
+                          .ease(d3.easeLinear)
+                          .attr("d", (d) => linePath(d));
+
+                        var interpolates = [
+                          "curveLinear",
+                          "curveStep",
+                          "curveStepBefore",
+                          "curveStepAfter",
+                          "curveBasis",
+                          "curveCardinal",
+                          "curveMonotoneX",
+                          "curveCatmullRom",
+                        ];
+
+                        // d3.select("body")
+                        //   .selectAll(".btn")
+                        //   .data(interpolates)
+                        //   .data("curveBasis")
+                        //   .enter()
+                        //   .append("button")
+                        //   .classed("btn", true)
+                        //   .text(function (d) {
+                        //     return d;
+                        //   });
+
+                        d3.selectAll(".btn").on("click", function (e) {
+                          var interpolate = d3.select(this).text();
+
+                          var linePath = d3
+                            .line()
+                            .x((d) => xScale(d.DataInfo) + margin)
+                            .y((d) => yScale2(d.Tachometer) + margin)
+                            //.x((d) => xScale(d.year) + margin)
+                            //.y((d) => yScale2(d.value) + margin)
+                            .curve(d3[interpolates[4]]);
+
+                          svg
+                            .selectAll("path.xline")
+                            .transition()
+                            .duration(1000)
+                            .ease(d3.easeLinear)
+                            .attr("d", (d) => linePath(d));
+                        });
+                      }
+                      function erase (){
+                          svg
+                            .selectAll("path.xline")
+                            .transition()
+                            .duration(10)
+                            .ease(d3.easeLinear)
+                        };
+                      </script>
+                      <!-- <img style="width: 760px; height: 456px;" src="img/graph.png" alt="..."> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+    <script>
+      // 스크롤 막는 element.style 속성 제거
+      $(document).ready(function () {
+        document.querySelector("#L_p04").removeAttribute("style");
+      });
+
+      // "AIS 운항 데이터 조회"를 첫 페이지로
+      $(document).ready(function () {
+        $("#aisViewer").show();
+        $("#date_dropdown").show();
+
+        $("#time_dropdown").hide();
+        $("#selectTool").hide();
+        $("#equipment").hide();
+        $("#monitoring").hide();
+      });
+
+      let divide = 0;
+
+      // 사이드바 라우터
+      $(function () {
+        $("#aisViewerBtn").on("click", function () {
+          divide = 0;
+
+          $("#aisViewer").show();
+          $("#date_dropdown").show();
+
+          $("#time_dropdown").hide();
+          $("#selectTool").hide();
+          $("#equipment").hide();
+          $("#monitoring").hide();
+        });
+        $("#equipmentBtn").on("click", function () {
+          divide = 1;
+
+          $("#aisViewer").hide();
+          $("#equipment").show();
+
+          $("#selectTool").show();
+          $("#time_dropdown").hide();
+          $("#date_dropdown").hide();
+
+          $("#monitoring").hide();
+        });
+        $("#monitoringBtn").on("click", function () {
+          divide = 2;
+
+          $("#aisViewer").hide();
+          $("#equipment").hide();
+          $("#selectTool").hide();
+
+          $("#monitoring").show();
+          $("#date_dropdown").show();
+          $("#time_dropdown").show();
+        });
+      });
+
+      //   // 테이블 데이터 GET
+      //   async function doSearch() {
+      //     console.log("작동확인");
+      //     // const gender = document.querySelector("#gender").value;
+      //     // const name = document.querySelector("#name").value;
+
+      //     let resource = "http://localhost:3000/record";
+      //     // if (gender === "") {
+      //     //   if (name !== "") {
+      //     //     resource = `http://localhost:3000/customers?name_like=${name}`;
+      //     //   }
+      //     // } else {
+      //     //   if (name === "") {
+      //     //     resource = `http://localhost:3000/customers?gender=${gender}`;
+      //     //   } else {
+      //     //     resource = `http://localhost:3000/customers?gender=${gender}&name_like=${name}`;
+      //     //   }
+      //     // }
+
+      //     // if (gender !== "") {
+      //     //   resource = `http://localhost:3000/customers?gender=${gender}`;
+      //     // }
+
+      //     const res = await fetch(resource);
+      //     const resJson = await res.json();
+      //     console.log(resJson);
+      //     renderTable(resJson);
+      //   }
+      // 테이블 데이터 GET
+      async function doSearch() {
+        console.log("작동확인");
+        // const gender = document.querySelector("#gender").value;
+        // const name = document.querySelector("#name").value;
+
+        // let resource = "http://localhost:3000/record";
+        // if (gender === "") {
+        //   if (name !== "") {
+        //     resource = `http://localhost:3000/customers?name_like=${name}`;
+        //   }
+        // } else {
+        //   if (name === "") {
+        //     resource = `http://localhost:3000/customers?gender=${gender}`;
+        //   } else {
+        //     resource = `http://localhost:3000/customers?gender=${gender}&name_like=${name}`;
+        //   }
+        // }
+
+        // if (gender !== "") {
+        //   resource = `http://localhost:3000/customers?gender=${gender}`;
+        // }
+
+        // const res = await fetch(resource);
+        // const resJson = await res.json();
+        // console.log(resJson);
+        // let hannaraImg = JSON.parse(JSON.stringify(img));
+        // console.log(hannaraImg);
+
+        console.log("doSearch: ", equipmentImg);
+        // renderTable(equipment_);
+      }
+
+      // 테이블 렌더링
+      function renderTable(data) {
+        equipmentData = data;
+        const h = [];
+        let number = 1;
+        for (const item of data) {
+          h.push("<tr>");
+          h.push(`<td>${number}</td>`);
+          h.push(`<td>${item.Equipmentname}</td>`);
+          h.push(
+            `<td><a href="javascript:openModal('${item.image}');"><img width="50px" src="${item.image}" alt=""></a></td>`
+          );
+          h.push("</tr>");
+          number ++
+        }
+
+        document.querySelector("#tbBody").innerHTML = h.join("");
+      }
+
+      function doSearchShip() {
+        console.log("selectShip : ", selectShip.value);
+        selectedShip(selectShip.value);
+        //url 입력해주어야함.------------------------------------------------------
+        sendData("http://112.218.175.109:8090/", divide);
+        //sendData("http://192.168.219.101:5000/", divide);
+      }
+
+      function selectedShip(ship) {
+        if (ship === "hanbada") {
+          document.querySelector("#hannara").style.display = "none";
+          document.querySelector("#hanbada").style.display = "block";
+          //renderTable(equipment_data); 
+          doSearch();
+        } else {
+          document.querySelector("#hannara").style.display = "block";
+          document.querySelector("#hanbada").style.display = "none";
+          //renderTable(equipment_data); 
+          doSearch();
+        }
+      }
+      //드롭다운(input type="date") placeholder설정
+      $("input[type=date].placeholder-date").on("change", (e) => {
+        const target = $(e.target);
+        if (target.val() == "") target.addClass("date_empty");
+        else target.removeClass("date_empty");
+      });
+
+      $("input[type=time].placeholder-date").on("change", (e) => {
+        const target = $(e.target);
+        if (target.val() == "") target.addClass("date_empty");
+        else target.removeClass("date_empty");
+      });
+
+      function sendData(url, divide) {
+        let selectShip = $("#selectShip").val();
+        let startDate = $("#startDate").val();
+        let endDate = $("#endDate").val();
+        let startTime = $("#startTime").val();
+        let endTime = $("#endTime").val();
+        let selectTool = $("#selectTool").val();
+
+        let urlText = "";
+
+        //AIS데이터 조회시
+        const data_0 = {
+          ShipName: selectShip,
+          startDate: startDate,
+          endDate: endDate,
+        };
+
+        //장비,설비 조회시
+        const data_1 = {
+          ShipName: selectShip,
+          selectTool: selectTool,
+        };
+
+        //추진축계/기관엔진 데이터 조회시
+        const data_2 = {
+          ShipName: selectShip,
+          startDate: startDate,
+          endDate: endDate,
+          startTime: startTime,
+          endTime: endTime,
+        };
+
+        let data;
+        if (divide == 1) {
+          urlText = "equipmentInfo"
+          data = data_1;
+        } else if (divide == 2) {
+          urlText = "vibrationInfo"
+          data = data_2;
+        } else {
+          urlText = "navInfo"
+          data = data_0;
+        }
+
+        var AIS_data;
+        var equip_data;
+        var engine_data;
+        var vibrate_data;
+
+        $.ajax({
+          crossorigin: true,
+          url: url+urlText,
+          type: "POST",
+          dataType: "json",
+          data: data,
+          success: function (data) {
+            console.log(data.data);
+            console.log(data.engineData)
+
+            //erase()
+            if(divide == 1){
+              equip_data = data.data;
+              renderTable(equip_data)
+
+            }else if(divide == 2){
+              equip_data = data.data;
+              engine_data = data.engineData;
+              D3B(equip_data)
+              D3A(engine_data)
+              
+            }else {
+              AIS_data = data.data;
+              good()
+            }
+          },
+          error: function () {
+            alert("error");
+          },
+        });
+      }
+      // 날짜 Min, Max 설정
+      function setDate() {
+        let ship = $("#selectShip").val();
+        console.log("setDate() : " + ship);
+        let startDate = $("#startDate");
+        let endDate = $("#endDate");
+
+        if (ship == "HANNARA") {
+          if (divide == 0) {
+            //AIS
+            startDate.attr("min", "2020-09-07");
+            startDate.attr("max", "2021-11-03");
+
+            endDate.attr("min", "2020-09-08");
+            endDate.attr("max", "2021-11-04");
+          } else if (divide == 2) {
+            //기관엔진
+            startDate.attr("min", "2020-12-25");
+            startDate.attr("max", "2021-01-02");
+
+            endDate.attr("min", "2020-12-26");
+            endDate.attr("max", "2021-01-03");
+          }
+        } else if (ship == "HANBADA") {
+          if (divide == 0) {
+            //AIS
+            startDate.attr("min", "2020-09-07");
+            startDate.attr("max", "2021-11-03");
+
+            endDate.attr("min", "2020-09-08");
+            endDate.attr("max", "2021-11-04");
+          } else if (divide == 2) {
+            //기관엔진
+            startDate.attr("min", "2020-12-25");
+            startDate.attr("max", "2020-12-27");
+
+            endDate.attr("min", "2020-12-26");
+            endDate.attr("max", "2020-12-28");
+          }
+        }
+      }
+      //----------------DB에서 받아온 날짜 데이터를 input[type='date']에 넣는 방법-----------------------
+      //let dateVal = "2022-10-10"
+      // $(document).ready(function () {
+      //   $("#startDate").attr("min", dateVal);
+      // });
+    </script>
+    <script src="js/sb-admin-2.min.js"></script>
+  </body>
+</html>
